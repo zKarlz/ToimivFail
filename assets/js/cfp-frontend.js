@@ -93,13 +93,19 @@
     state.frameImg.src = f.url;
   }
 
+  function updateUserTransform(){
+    var t = 'rotate(' + (state.rot || 0) + 'deg) scaleX(' + (state.flipH ? -1 : 1) + ') scaleY(' + (state.flipV ? -1 : 1) + ')';
+    $('.cfp-editor-user').css('transform', t);
+  }
+
   function resetUserTransform(){
     state.rot = 0; state.flipH = false; state.flipV = false;
     state.userPos = {x:0, y:0};
     var $u = $('.cfp-editor-user');
     var $ov = $('.cfp-editor-overlay');
     var ow = $ov.width(), oh = $ov.height();
-    $u.css({transform:'', left:0, top:0, width:ow+'px', height:oh+'px'});
+    updateUserTransform();
+    $u.css({left:0, top:0, width:ow+'px', height:oh+'px'});
   }
 
   function layoutOverlay(){
@@ -308,10 +314,10 @@
     $('.cfp-close, .cfp-m-cancel').on('click', function(){ closeModal(); });
 
     // Controls
-    $rotL.on('click', function(){ state.rot -= 90; });
-    $rotR.on('click', function(){ state.rot += 90; });
-    $fH.on('click', function(){ state.flipH = !state.flipH; });
-    $fV.on('click', function(){ state.flipV = !state.flipV; });
+    $rotL.on('click', function(){ state.rot -= 90; updateUserTransform(); });
+    $rotR.on('click', function(){ state.rot += 90; updateUserTransform(); });
+    $fH.on('click', function(){ state.flipH = !state.flipH; updateUserTransform(); });
+    $fV.on('click', function(){ state.flipV = !state.flipV; updateUserTransform(); });
 
     // Apply: compose + upload
     $mApply.on('click', function(){
