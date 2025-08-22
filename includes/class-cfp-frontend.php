@@ -140,10 +140,6 @@ final class CFP_Frontend {
               </div>
             </div>
             <div class="cfp-modal-toolbar">
-              <button type="button" class="button cfp-m-rot-left">⟲</button>
-              <button type="button" class="button cfp-m-rot-right">⟳</button>
-              <button type="button" class="button cfp-m-flip-h">⇋</button>
-              <button type="button" class="button cfp-m-flip-v">⇅</button>
               <button type="button" class="button button-primary cfp-m-apply"><?php esc_html_e('Apply','wc-cfp');?></button>
               <button type="button" class="button cfp-m-cancel"><?php esc_html_e('Cancel','wc-cfp');?></button>
             </div>
