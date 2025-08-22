@@ -189,10 +189,12 @@
     $('body').addClass('modal-open');
     selectFrame(state.frameIdx || 0);
     layoutOverlay();
+    $(window).off('resize.cfp').on('resize.cfp', layoutOverlay);
   }
   function closeModal(){
     $('#cfp-modal-bg, #cfp-modal').hide();
     $('body').removeClass('modal-open');
+    $(window).off('resize.cfp');
   }
 
   // Compose mockup to data URL + upload
