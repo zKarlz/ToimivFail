@@ -40,6 +40,7 @@
     frames: Array.isArray(CFP && CFP.frames) ? CFP.frames : [],
     frameImg: null,
     userImg: null,
+    originalFile: null,
     overlayPx: null, // {x,y,w,h,rotation,ratio}
     rot: 0,
     flipH: false,
@@ -288,6 +289,7 @@
       if (!file) return;
       if (!/image\/(jpeg|jpg|png)$/i.test(file.type)){ alert(CFP.i18n.invalid); return; }
       if (file.size > ((CFP.maxMB||15)*1024*1024)){ alert(CFP.i18n.tooBig); return; }
+      state.originalFile = file;
       $meta.text(file.name + ' (' + Math.round(file.size/1024) + ' KB)');
       var reader = new FileReader();
       reader.onload = function(e){
@@ -314,12 +316,12 @@
     // Apply: compose + upload
     $mApply.on('click', function(){
       var c = compose(1500);
-      var o = composeOriginal();
+      var o = state.originalFile ? null : composeOriginal();
       if (!c || !c.dataUrl){ alert('Compose failed'); return; }
-      if (!o || !o.dataUrl){ alert('Compose failed'); return; }
+      if (!state.originalFile && (!o || !o.dataUrl)){ alert('Compose failed'); return; }
       try { window.cfpLastDataUrl = c.dataUrl; $('input[name="cfp_image_data"]').val(c.dataUrl); } catch(e){}
       var previewBlob = dataURLToBlob(c.dataUrl);
-      var originalBlob = dataURLToBlob(o.dataUrl);
+      var originalBlob = state.originalFile ? state.originalFile : dataURLToBlob(o.dataUrl);
       uploadBlob(previewBlob, function(err, previewUrl){
         if (!err && previewUrl){
           try{
