@@ -274,22 +274,13 @@ final class CFP_Frontend {
     /** Admin order view preview + original with buttons */
     public static function admin_order_preview($item_id, $item, $product){
         if (!is_object($item)) return;
-        $prev = $item->get_meta('Custom Photo URL', true);
         $orig = $item->get_meta('Original Photo URL', true);
-        if ($prev || $orig){
-            echo '<div class="cfp-admin-preview" style="margin-top:6px;display:flex;gap:18px;flex-wrap:wrap;">';
-            if ($prev){
-                echo '<div><div style="font-size:11px;opacity:.7;margin-bottom:4px">'.esc_html__('Preview','wc-cfp').'</div>';
-                echo '<img src="'.esc_url($prev).'" style="max-width:120px;height:auto;border:1px solid #ddd;border-radius:4px;display:block;margin-bottom:6px" />';
-                echo '<a class="button" target="_blank" href="'.esc_url($prev).'">'.esc_html__('Open','wc-cfp').'</a> ';
-                echo '<a class="button" download href="'.esc_url($prev).'">'.esc_html__('Download','wc-cfp').'</a></div>';
-            }
-            if ($orig){
-                echo '<div><div style="font-size:11px;opacity:.7;margin-bottom:4px">'.esc_html__('Original','wc-cfp').'</div>';
-                echo '<img src="'.esc_url($orig).'" style="max-width:120px;height:auto;border:1px solid #ddd;border-radius:4px;display:block;margin-bottom:6px" />';
-                echo '<a class="button" target="_blank" href="'.esc_url($orig).'">'.esc_html__('Open','wc-cfp').'</a> ';
-                echo '<a class="button" download href="'.esc_url($orig).'">'.esc_html__('Download','wc-cfp').'</a></div>';
-            }
+        if ($orig){
+            echo '<div class="cfp-admin-preview" style="margin-top:6px;">';
+            echo '<div><div style="font-size:11px;opacity:.7;margin-bottom:4px">'.esc_html__('Original','wc-cfp').'</div>';
+            echo '<img src="'.esc_url($orig).'" style="max-width:120px;height:auto;border:1px solid #ddd;border-radius:4px;display:block;margin-bottom:6px" />';
+            echo '<a class="button" target="_blank" href="'.esc_url($orig).'">'.esc_html__('Open','wc-cfp').'</a> ';
+            echo '<a class="button" download href="'.esc_url($orig).'">'.esc_html__('Download','wc-cfp').'</a></div>';
             echo '</div>';
         }
     }
