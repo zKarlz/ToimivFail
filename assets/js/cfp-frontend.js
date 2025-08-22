@@ -41,10 +41,7 @@
     frameImg: null,
     userImg: null,
     originalFile: null,
-    overlayPx: null, // {x,y,w,h,rotation,ratio}
-    rot: 0,
-    flipH: false,
-    flipV: false,
+    overlayPx: null, // {x,y,w,h,ratio}
     drag: {on:false, sx:0, sy:0, ox:0, oy:0},
     userPos: {x:0, y:0} // relative within overlay
   };
@@ -79,7 +76,6 @@
         ov.x = margin; ov.y = margin;
         ov.w = Math.max(16, FW - margin * 2);
         ov.h = Math.max(16, FH - margin * 2);
-        ov.rotation = 0;
         ov.ratio = ov.h / ov.w;
       } else {
         ov.ratio = parseFloat(ov.ratio || 1) || 1;
@@ -94,18 +90,11 @@
     state.frameImg.src = f.url;
   }
 
-  function updateUserTransform(){
-    var t = 'rotate(' + (state.rot || 0) + 'deg) scaleX(' + (state.flipH ? -1 : 1) + ') scaleY(' + (state.flipV ? -1 : 1) + ')';
-    $('.cfp-editor-user img').css('transform', t);
-  }
-
   function resetUserTransform(){
-    state.rot = 0; state.flipH = false; state.flipV = false;
     state.userPos = {x:0, y:0};
     var $u = $('.cfp-editor-user');
     var $ov = $('.cfp-editor-overlay');
     var ow = $ov.width(), oh = $ov.height();
-    updateUserTransform();
     $u.css({left:0, top:0, width:ow+'px', height:oh+'px'});
   }
 
@@ -229,11 +218,9 @@
     var ovScale = $('.cfp-editor-overlay').width() / state.overlayPx.w;
     var dispW = $u.width() / ovScale, dispH = $u.height() / ovScale;
     var scaleX = dispW / uw, scaleY = dispH / uh;
-    ctx.translate(ov.x + (state.userPos.x / ovScale) + dispW / 2, ov.y + (state.userPos.y / ovScale) + dispH / 2);
-    var rad = (state.rot || 0) * Math.PI/180;
-    ctx.rotate(rad);
-    ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
-    ctx.drawImage(state.userImg, -uw*scaleX/2, -uh*scaleY/2, uw*scaleX, uh*scaleY);
+    var dx = ov.x + (state.userPos.x / ovScale);
+    var dy = ov.y + (state.userPos.y / ovScale);
+    ctx.drawImage(state.userImg, dx, dy, uw*scaleX, uh*scaleY);
     ctx.restore();
 
     // draw frame top (optional, if you had a cutout; here frame covers edges already)
@@ -255,13 +242,9 @@
     var ovScale = $('.cfp-editor-overlay').width() / state.overlayPx.w;
     var dispW = $u.width() / ovScale, dispH = $u.height() / ovScale;
     var scaleX = dispW / uw, scaleY = dispH / uh;
-    ctx.save();
-    ctx.translate((state.userPos.x / ovScale) + dispW / 2, (state.userPos.y / ovScale) + dispH / 2);
-    var rad = (state.rot || 0) * Math.PI/180;
-    ctx.rotate(rad);
-    ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
-    ctx.drawImage(state.userImg, -uw*scaleX/2, -uh*scaleY/2, uw*scaleX, uh*scaleY);
-    ctx.restore();
+    var dx = state.userPos.x / ovScale;
+    var dy = state.userPos.y / ovScale;
+    ctx.drawImage(state.userImg, dx, dy, uw*scaleX, uh*scaleY);
 
     return {canvas: can, dataUrl: can.toDataURL('image/jpeg', (CFP && CFP.jpegQ) ? CFP.jpegQ : 0.9)};
   }
@@ -290,7 +273,6 @@
     var $drop = $('.cfp-drop'), $file = $('.cfp-file'), $meta = $('.cfp-file-meta');
     var $bg = $('#cfp-modal-bg'), $modal = $('#cfp-modal');
     var $mApply = $('.cfp-m-apply'), $mCancel = $('.cfp-m-cancel');
-    var $rotL = $('.cfp-m-rot-left'), $rotR = $('.cfp-m-rot-right'), $fH = $('.cfp-m-flip-h'), $fV = $('.cfp-m-flip-v');
     var $userWrap = $('.cfp-editor-user'), $userImg = $userWrap.find('img');
 
     function loadUser(file){
@@ -314,12 +296,6 @@
     $drop.on('drop', function(e){ e.preventDefault(); $drop.removeClass('dragover'); var f = e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files[0]; loadUser(f); });
 
     $('.cfp-close, .cfp-m-cancel').on('click', function(){ closeModal(); });
-
-    // Controls
-    $rotL.on('click', function(){ state.rot -= 90; updateUserTransform(); });
-    $rotR.on('click', function(){ state.rot += 90; updateUserTransform(); });
-    $fH.on('click', function(){ state.flipH = !state.flipH; updateUserTransform(); });
-    $fV.on('click', function(){ state.flipV = !state.flipV; updateUserTransform(); });
 
     // Apply: compose + upload
     $mApply.on('click', function(){
