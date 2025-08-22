@@ -78,36 +78,18 @@
       if (!ov.w || !ov.h || typeof ov.x === 'undefined' || typeof ov.y === 'undefined'){
         var margin = Math.round(96 * (1/2.54));
         ov.x = margin; ov.y = margin;
-        ov.w = Math.max(16, FW - margin*2);
-        ov.h = Math.max(16, FH - margin*2);
+        ov.w = Math.max(16, FW - margin * 2);
+        ov.h = Math.max(16, FH - margin * 2);
         ov.rotation = 0;
         ov.ratio = ov.h / ov.w;
       } else {
         ov.ratio = parseFloat(ov.ratio || 1) || 1;
       }
       state.overlayPx = ov;
-      // Position overlay DOM
-      var $wrap = $('.cfp-editor-wrap');
-      var $frame = $('.cfp-editor-frame');
-      var $ov = $('.cfp-editor-overlay');
-      $frame.attr('src', f.url);
-      // fit frame element into wrap bounds; we keep overlay DOM in percentages relative to displayed frame rect
-      // For simplicity we set absolute px via transform translate(-50%,-50%)
-      $frame.css({left:'50%', top:'50%', transform:'translate(-50%,-50%)'});
-      // Compute displayed overlay box relative to wrap size
-      // Because we don't know actual rendered pixels before image paints, delay a tick:
-      setTimeout(function(){
-        var w = $frame[0].clientWidth, h = $frame[0].clientHeight;
-        // scale from natural to displayed
-        var sx = w / state.frameImg.naturalWidth;
-        var sy = h / state.frameImg.naturalHeight;
-        var dx = state.overlayPx.x * sx, dy = state.overlayPx.y * sy, dw = state.overlayPx.w * sx, dh = state.overlayPx.h * sy;
-        $ov.css({width: dw+'px', height: dh+'px', left:'50%', top:'50%', transform: 'translate('+(dx - w/2)+'px,'+(dy - h/2)+'px)'});
-        // reset user image
-        resetUserTransform();
-      }, 50);
+      $('.cfp-editor-frame').attr('src', f.url);
+      layoutOverlay();
       // set label
-      $('#cfp_frame_label').val(f.label || ('Frame '+(i+1)));
+      $('#cfp_frame_label').val(f.label || ('Frame ' + (i + 1)));
     };
     state.frameImg.src = f.url;
   }
@@ -117,6 +99,24 @@
     state.userPos = {x:0, y:0};
     var $u = $('.cfp-editor-user');
     $u.css({transform:'', left:0, top:0});
+  }
+
+  function layoutOverlay(){
+    var $frame = $('.cfp-editor-frame');
+    var $ov = $('.cfp-editor-overlay');
+    if (!$frame.length || !$ov.length || !state.frameImg || !state.overlayPx){
+      return;
+    }
+    $frame.css({left: '50%', top: '50%', transform: 'translate(-50%,-50%)'});
+    setTimeout(function(){
+      var w = $frame[0].clientWidth, h = $frame[0].clientHeight;
+      var sx = w / state.frameImg.naturalWidth;
+      var sy = h / state.frameImg.naturalHeight;
+      var dx = state.overlayPx.x * sx, dy = state.overlayPx.y * sy;
+      var dw = state.overlayPx.w * sx, dh = state.overlayPx.h * sy;
+      $ov.css({width: dw + 'px', height: dh + 'px', left: '50%', top: '50%', transform: 'translate(' + (dx - w / 2) + 'px,' + (dy - h / 2) + 'px)'});
+      resetUserTransform();
+    }, 50);
   }
 
   // Dragging inside overlay
@@ -150,6 +150,8 @@
   function openModal(){
     $('#cfp-modal-bg, #cfp-modal').show();
     $('body').addClass('modal-open');
+    selectFrame(state.frameIdx || 0);
+    layoutOverlay();
   }
   function closeModal(){
     $('#cfp-modal-bg, #cfp-modal').hide();
@@ -212,7 +214,6 @@
   $(function(){
     // Build frame thumbs
     buildFrames();
-    if (state.frames && state.frames.length){ selectFrame(0); }
 
     var $drop = $('.cfp-drop'), $file = $('.cfp-file'), $meta = $('.cfp-file-meta');
     var $bg = $('#cfp-modal-bg'), $modal = $('#cfp-modal');
