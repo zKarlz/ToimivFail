@@ -1,0 +1,26 @@
+.cfp-controls{border:1px solid #e5e7eb; padding:16px; border-radius:8px; margin:16px 0;}
+.cfp-title-frames,.cfp-title-upload{margin:8px 0; font-weight:600;}
+.cfp-frames{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+.cfp-frame-thumb{border:2px solid transparent; border-radius:6px; overflow:hidden; cursor:pointer; outline:none;}
+.cfp-frame-thumb.active{border-color:#2563eb;}
+.cfp-frame-thumb img{display:block; width:80px; height:80px; object-fit:cover;}
+.cfp-drop{border:2px dashed #d1d5db; border-radius:8px; padding:14px; text-align:center; background:#fafafa;}
+.cfp-drop.dragover{background:#eef2ff; border-color:#6366f1;}
+.cfp-browse span{color:#2563eb; text-decoration:underline; cursor:pointer;}
+.cfp-file-meta{font-size:12px; color:#6b7280; margin-top:6px;}
+.cfp-note{font-size:12px; color:#6b7280; margin:8px 0 0;}
+
+.cfp-modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9998;}
+.cfp-modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:9999;}
+.cfp-modal-panel{background:#fff; border-radius:10px; width:min(96vw, 920px); max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.2);}
+.cfp-modal-header{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #eee;}
+.cfp-modal-title{font-weight:600;}
+.cfp-close{background:none; border:none; font-size:22px; cursor:pointer; line-height:1;}
+.cfp-modal-body{padding:10px; overflow:auto;}
+.cfp-editor-wrap{position:relative; width:100%; aspect-ratio:1/1; background:#111; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.cfp-editor-frame{position:absolute; max-width:100%; max-height:100%; width:auto; height:auto;}
+.cfp-editor-overlay{position:absolute; border:1px dashed rgba(255,255,255,.35); box-shadow:0 0 0 200vmax rgba(0,0,0,.65); pointer-events:none;}
+.cfp-editor-user{position:absolute; left:0; top:0; pointer-events:auto; cursor:grab;}
+
+.cfp-modal-toolbar{display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:10px; border-top:1px solid #eee;}
+.cfp-modal-toolbar .button{min-width:40px;}

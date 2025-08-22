@@ -1,0 +1,5 @@
+#cfp-frames-repeater .cfp-row{display:flex; gap:16px; padding:12px; border:1px solid #e2e2e2; border-radius:6px; margin-bottom:12px; background:#fff;}
+#cfp-frames-repeater .cfp-col{flex:1 1 0; min-width:0;}
+#cfp-frames-repeater .cfp-overlay .cfp-grid{display:grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap:6px;}
+#cfp-frames-repeater .cfp-thumb{margin-top:6px;}
+#cfp-frames-repeater .cfp-remove{align-self:flex-start; color:#b32d2e; cursor:pointer;}
