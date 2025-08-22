@@ -23,10 +23,10 @@
 .cfp-editor-user{position:absolute; left:0; top:0; pointer-events:auto; cursor:grab;}
 
 .cfp-resize-handle{position:absolute;width:12px;height:12px;background:#fff;border:1px solid #000;pointer-events:auto;}
-.cfp-rh-nw{left:-6px;top:-6px;cursor:nwse-resize;}
-.cfp-rh-ne{right:-6px;top:-6px;cursor:nesw-resize;}
-.cfp-rh-sw{left:-6px;bottom:-6px;cursor:nesw-resize;}
-.cfp-rh-se{right:-6px;bottom:-6px;cursor:nwse-resize;}
+.cfp-rh-nw{left:0;top:0;transform:translate(-50%,-50%);cursor:nwse-resize;}
+.cfp-rh-ne{right:0;top:0;transform:translate(50%,-50%);cursor:nesw-resize;}
+.cfp-rh-sw{left:0;bottom:0;transform:translate(-50%,50%);cursor:nesw-resize;}
+.cfp-rh-se{right:0;bottom:0;transform:translate(50%,50%);cursor:nwse-resize;}
 
 .cfp-modal-toolbar{display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:10px; border-top:1px solid #eee;}
 .cfp-modal-toolbar .button{min-width:40px;}
