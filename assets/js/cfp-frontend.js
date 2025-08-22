@@ -41,13 +41,11 @@
     frameImg: null,
     userImg: null,
     overlayPx: null, // {x,y,w,h,rotation,ratio}
-    zoom: 1,
     rot: 0,
     flipH: false,
     flipV: false,
     drag: {on:false, sx:0, sy:0, ox:0, oy:0},
-    userPos: {x:0, y:0}, // relative within overlay
-    userScale: 1
+    userPos: {x:0, y:0} // relative within overlay
   };
 
   // Build UI thumbnails
@@ -95,10 +93,12 @@
   }
 
   function resetUserTransform(){
-    state.zoom = 1; state.rot = 0; state.flipH = false; state.flipV = false;
+    state.rot = 0; state.flipH = false; state.flipV = false;
     state.userPos = {x:0, y:0};
     var $u = $('.cfp-editor-user');
-    $u.css({transform:'', left:0, top:0});
+    var $ov = $('.cfp-editor-overlay');
+    var ow = $ov.width(), oh = $ov.height();
+    $u.css({transform:'', left:0, top:0, width:ow+'px', height:oh+'px'});
   }
 
   function layoutOverlay(){
@@ -115,6 +115,10 @@
       var dx = state.overlayPx.x * sx, dy = state.overlayPx.y * sy;
       var dw = state.overlayPx.w * sx, dh = state.overlayPx.h * sy;
       $ov.css({width: dw + 'px', height: dh + 'px', left: '50%', top: '50%', transform: 'translate(' + (dx - w / 2) + 'px,' + (dy - h / 2) + 'px)'});
+      if(!$ov.find('.cfp-resize-handle').length){
+        ['nw','ne','sw','se'].forEach(function(p){ $ov.append('<div class="cfp-resize-handle cfp-rh-'+p+'"></div>'); });
+        bindResizing();
+      }
       resetUserTransform();
     }, 50);
   }
@@ -143,6 +147,39 @@
       if (!state.drag.on) return;
       state.drag.on = false;
       $u.css('cursor','grab');
+    });
+  }
+
+  function bindResizing(){
+    var $ov = $('.cfp-editor-overlay');
+    var $u = $('.cfp-editor-user');
+    var resize = {on:false, cx:0, cy:0, dist:0, w:0, h:0};
+    $ov.on('mousedown touchstart', '.cfp-resize-handle', function(e){
+      e.preventDefault(); e.stopPropagation();
+      var pt = e.touches && e.touches[0] ? e.touches[0] : e;
+      var rect = $u[0].getBoundingClientRect();
+      resize.on = true;
+      resize.w = rect.width; resize.h = rect.height;
+      resize.cx = rect.left + rect.width/2;
+      resize.cy = rect.top + rect.height/2;
+      resize.dist = Math.hypot(pt.clientX - resize.cx, pt.clientY - resize.cy);
+    });
+    $(document).on('mousemove touchmove', function(e){
+      if(!resize.on) return;
+      var pt = e.touches && e.touches[0] ? e.touches[0] : e;
+      var dist = Math.hypot(pt.clientX - resize.cx, pt.clientY - resize.cy);
+      var scale = dist / resize.dist;
+      var newW = resize.w * scale;
+      var newH = newW * state.overlayPx.ratio;
+      var ovRect = $ov[0].getBoundingClientRect();
+      var centerX = resize.cx - ovRect.left;
+      var centerY = resize.cy - ovRect.top;
+      state.userPos.x = centerX - newW/2;
+      state.userPos.y = centerY - newH/2;
+      $u.css({width:newW+'px', height:newH+'px', left:state.userPos.x+'px', top:state.userPos.y+'px'});
+    });
+    $(document).on('mouseup touchend touchcancel', function(){
+      if(resize.on) resize.on = false;
     });
   }
 
@@ -179,13 +216,14 @@
     // Compute user draw transform:
     // Determine displayed overlay scale: user image base scale so that shorter side fits overlay
     var uw = state.userImg.naturalWidth, uh = state.userImg.naturalHeight;
-    var baseScale = Math.max(ov.w/uw, ov.h/uh);
-    var scale = baseScale * state.zoom;
-    ctx.translate(ov.x + ov.w/2 + state.userPos.x, ov.y + ov.h/2 + state.userPos.y);
+    var $u = $('.cfp-editor-user');
+    var dispW = $u.width(), dispH = $u.height();
+    var scaleX = dispW/uw, scaleY = dispH/uh;
+    ctx.translate(ov.x + state.userPos.x + dispW/2, ov.y + state.userPos.y + dispH/2);
     var rad = (state.rot || 0) * Math.PI/180;
     ctx.rotate(rad);
     ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
-    ctx.drawImage(state.userImg, -uw*scale/2, -uh*scale/2, uw*scale, uh*scale);
+    ctx.drawImage(state.userImg, -uw*scaleX/2, -uh*scaleY/2, uw*scaleX, uh*scaleY);
     ctx.restore();
 
     // draw frame top (optional, if you had a cutout; here frame covers edges already)
@@ -217,7 +255,7 @@
 
     var $drop = $('.cfp-drop'), $file = $('.cfp-file'), $meta = $('.cfp-file-meta');
     var $bg = $('#cfp-modal-bg'), $modal = $('#cfp-modal');
-    var $mZoom = $('.cfp-m-zoom'), $mApply = $('.cfp-m-apply'), $mCancel = $('.cfp-m-cancel');
+    var $mApply = $('.cfp-m-apply'), $mCancel = $('.cfp-m-cancel');
     var $rotL = $('.cfp-m-rot-left'), $rotR = $('.cfp-m-rot-right'), $fH = $('.cfp-m-flip-h'), $fV = $('.cfp-m-flip-v');
     var $user = $('.cfp-editor-user');
 
@@ -243,7 +281,6 @@
     $('.cfp-close, .cfp-m-cancel').on('click', function(){ closeModal(); });
 
     // Controls
-    $mZoom.on('input change', function(){ state.zoom = parseFloat(this.value||'1') || 1; });
     $rotL.on('click', function(){ state.rot -= 90; });
     $rotR.on('click', function(){ state.rot += 90; });
     $fH.on('click', function(){ state.flipH = !state.flipH; });
