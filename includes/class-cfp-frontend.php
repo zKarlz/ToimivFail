@@ -142,7 +142,6 @@ final class CFP_Frontend {
               <button type="button" class="button cfp-m-rot-right">⟳</button>
               <button type="button" class="button cfp-m-flip-h">⇋</button>
               <button type="button" class="button cfp-m-flip-v">⇅</button>
-              <label>Zoom <input type="range" class="cfp-m-zoom" min="0.25" max="3" step="0.01" value="1"/></label>
               <button type="button" class="button button-primary cfp-m-apply"><?php esc_html_e('Apply','wc-cfp');?></button>
               <button type="button" class="button cfp-m-cancel"><?php esc_html_e('Cancel','wc-cfp');?></button>
             </div>
