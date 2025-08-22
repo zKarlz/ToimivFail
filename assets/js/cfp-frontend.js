@@ -232,6 +232,29 @@
     return {canvas: can, dataUrl: window.cfpLastDataUrl};
   }
 
+  function composeOriginal(){
+    if (!state.userImg || !state.overlayPx) return null;
+    var ov = state.overlayPx;
+    var can = document.createElement('canvas');
+    can.width = ov.w; can.height = ov.h;
+    var ctx = can.getContext('2d');
+    ctx.clearRect(0, 0, ov.w, ov.h);
+
+    var uw = state.userImg.naturalWidth, uh = state.userImg.naturalHeight;
+    var $u = $('.cfp-editor-user');
+    var dispW = $u.width(), dispH = $u.height();
+    var scaleX = dispW/uw, scaleY = dispH/uh;
+    ctx.save();
+    ctx.translate(state.userPos.x + dispW/2, state.userPos.y + dispH/2);
+    var rad = (state.rot || 0) * Math.PI/180;
+    ctx.rotate(rad);
+    ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
+    ctx.drawImage(state.userImg, -uw*scaleX/2, -uh*scaleY/2, uw*scaleX, uh*scaleY);
+    ctx.restore();
+
+    return {canvas: can, dataUrl: can.toDataURL('image/jpeg', (CFP && CFP.jpegQ) ? CFP.jpegQ : 0.9)};
+  }
+
   // Upload helper
   function uploadBlob(blob, cb){
     var fd = new FormData();
@@ -243,7 +266,7 @@
       .done(function(res){
         try{ if(typeof res==='string'){ res = JSON.parse(res); } }catch(e){}
         var url = (res && res.data && res.data.url) ? res.data.url : (res && res.url ? res.url : null);
-        if (url){ try{ window.cfpUploadSuccess(url, null); }catch(e){} cb && cb(null, url); } else { cb && cb('bad response'); }
+        if (url){ cb && cb(null, url); } else { cb && cb('bad response'); }
       })
       .fail(function(){ cb && cb('ajax fail'); });
   }
@@ -289,19 +312,22 @@
     // Apply: compose + upload
     $mApply.on('click', function(){
       var c = compose(1500);
+      var o = composeOriginal();
       if (!c || !c.dataUrl){ alert('Compose failed'); return; }
-      // Immediately write data URL so PHP fallback can persist even if upload is slow.
+      if (!o || !o.dataUrl){ alert('Compose failed'); return; }
       try { window.cfpLastDataUrl = c.dataUrl; $('input[name="cfp_image_data"]').val(c.dataUrl); } catch(e){}
-      // Upload preview mockup
-      uploadBlob(dataURLToBlob(c.dataUrl), function(err, url){
-        if (!err && url){
-          // Replace product main image (best-effort)
+      var previewBlob = dataURLToBlob(c.dataUrl);
+      var originalBlob = dataURLToBlob(o.dataUrl);
+      uploadBlob(previewBlob, function(err, previewUrl){
+        if (!err && previewUrl){
           try{
             var $img = $('.woocommerce-product-gallery .wp-post-image, .woocommerce-product-gallery__image img, img.woocommerce-main-image').first();
-            if ($img.length){ $img.attr('src', url).attr('srcset',''); }
+            if ($img.length){ $img.attr('src', previewUrl).attr('srcset',''); }
           }catch(e){}
-          // Enable ATC
           try{ var $btn=$('form.cart').find('button.single_add_to_cart_button'); $btn.prop('disabled', false).removeClass('disabled'); }catch(e){}
+          uploadBlob(originalBlob, function(err2, originalUrl){
+            try { window.cfpUploadSuccess(previewUrl, (!err2 && originalUrl) ? originalUrl : null); }catch(e){}
+          });
         }
       });
       closeModal();
