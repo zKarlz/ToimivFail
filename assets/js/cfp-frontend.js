@@ -85,6 +85,7 @@
         ov.ratio = parseFloat(ov.ratio || 1) || 1;
       }
       state.overlayPx = ov;
+      $('.cfp-editor-wrap').css('aspect-ratio', FW + '/' + FH);
       $('.cfp-editor-frame').attr('src', f.url);
       layoutOverlay();
       // set label
@@ -226,9 +227,10 @@
     // Determine displayed overlay scale: user image base scale so that shorter side fits overlay
     var uw = state.userImg.naturalWidth, uh = state.userImg.naturalHeight;
     var $u = $('.cfp-editor-user');
-    var dispW = $u.width(), dispH = $u.height();
-    var scaleX = dispW/uw, scaleY = dispH/uh;
-    ctx.translate(ov.x + state.userPos.x + dispW/2, ov.y + state.userPos.y + dispH/2);
+    var ovScale = $('.cfp-editor-overlay').width() / state.overlayPx.w;
+    var dispW = $u.width() / ovScale, dispH = $u.height() / ovScale;
+    var scaleX = dispW / uw, scaleY = dispH / uh;
+    ctx.translate(ov.x + (state.userPos.x / ovScale) + dispW / 2, ov.y + (state.userPos.y / ovScale) + dispH / 2);
     var rad = (state.rot || 0) * Math.PI/180;
     ctx.rotate(rad);
     ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
@@ -251,10 +253,11 @@
 
     var uw = state.userImg.naturalWidth, uh = state.userImg.naturalHeight;
     var $u = $('.cfp-editor-user');
-    var dispW = $u.width(), dispH = $u.height();
-    var scaleX = dispW/uw, scaleY = dispH/uh;
+    var ovScale = $('.cfp-editor-overlay').width() / state.overlayPx.w;
+    var dispW = $u.width() / ovScale, dispH = $u.height() / ovScale;
+    var scaleX = dispW / uw, scaleY = dispH / uh;
     ctx.save();
-    ctx.translate(state.userPos.x + dispW/2, state.userPos.y + dispH/2);
+    ctx.translate((state.userPos.x / ovScale) + dispW / 2, (state.userPos.y / ovScale) + dispH / 2);
     var rad = (state.rot || 0) * Math.PI/180;
     ctx.rotate(rad);
     ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
