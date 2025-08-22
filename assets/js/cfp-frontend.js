@@ -112,6 +112,7 @@
   function layoutOverlay(){
     var $frame = $('.cfp-editor-frame');
     var $ov = $('.cfp-editor-overlay');
+    var $u = $('.cfp-editor-user');
     if (!$frame.length || !$ov.length || !state.frameImg || !state.overlayPx){
       return;
     }
@@ -123,8 +124,8 @@
       var dx = state.overlayPx.x * sx, dy = state.overlayPx.y * sy;
       var dw = state.overlayPx.w * sx, dh = state.overlayPx.h * sy;
       $ov.css({width: dw + 'px', height: dh + 'px', left: '50%', top: '50%', transform: 'translate(' + (dx - w / 2) + 'px,' + (dy - h / 2) + 'px)'});
-      if(!$ov.find('.cfp-resize-handle').length){
-        ['nw','ne','sw','se'].forEach(function(p){ $ov.append('<div class="cfp-resize-handle cfp-rh-'+p+'"></div>'); });
+      if(!$u.find('.cfp-resize-handle').length){
+        ['nw','ne','sw','se'].forEach(function(p){ $u.append('<div class="cfp-resize-handle cfp-rh-'+p+'"></div>'); });
         bindResizing();
       }
       resetUserTransform();
@@ -159,10 +160,9 @@
   }
 
   function bindResizing(){
-    var $ov = $('.cfp-editor-overlay');
     var $u = $('.cfp-editor-user');
-    var resize = {on:false, cx:0, cy:0, dist:0, w:0, h:0};
-    $ov.on('mousedown touchstart', '.cfp-resize-handle', function(e){
+    var resize = {on:false, cx:0, cy:0, dist:0, w:0, h:0, centerX:0, centerY:0};
+    $u.on('mousedown touchstart', '.cfp-resize-handle', function(e){
       e.preventDefault(); e.stopPropagation();
       var pt = e.touches && e.touches[0] ? e.touches[0] : e;
       var rect = $u[0].getBoundingClientRect();
@@ -171,6 +171,8 @@
       resize.cx = rect.left + rect.width/2;
       resize.cy = rect.top + rect.height/2;
       resize.dist = Math.hypot(pt.clientX - resize.cx, pt.clientY - resize.cy);
+      resize.centerX = state.userPos.x + resize.w/2;
+      resize.centerY = state.userPos.y + resize.h/2;
     });
     $(document).on('mousemove touchmove', function(e){
       if(!resize.on) return;
@@ -179,11 +181,8 @@
       var scale = dist / resize.dist;
       var newW = resize.w * scale;
       var newH = newW * state.overlayPx.ratio;
-      var ovRect = $ov[0].getBoundingClientRect();
-      var centerX = resize.cx - ovRect.left;
-      var centerY = resize.cy - ovRect.top;
-      state.userPos.x = centerX - newW/2;
-      state.userPos.y = centerY - newH/2;
+      state.userPos.x = resize.centerX - newW/2;
+      state.userPos.y = resize.centerY - newH/2;
       $u.css({width:newW+'px', height:newH+'px', left:state.userPos.x+'px', top:state.userPos.y+'px'});
     });
     $(document).on('mouseup touchend touchcancel', function(){
