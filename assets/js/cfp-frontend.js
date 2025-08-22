@@ -96,7 +96,7 @@
 
   function updateUserTransform(){
     var t = 'rotate(' + (state.rot || 0) + 'deg) scaleX(' + (state.flipH ? -1 : 1) + ') scaleY(' + (state.flipV ? -1 : 1) + ')';
-    $('.cfp-editor-user').css('transform', t);
+    $('.cfp-editor-user img').css('transform', t);
   }
 
   function resetUserTransform(){
@@ -291,7 +291,7 @@
     var $bg = $('#cfp-modal-bg'), $modal = $('#cfp-modal');
     var $mApply = $('.cfp-m-apply'), $mCancel = $('.cfp-m-cancel');
     var $rotL = $('.cfp-m-rot-left'), $rotR = $('.cfp-m-rot-right'), $fH = $('.cfp-m-flip-h'), $fV = $('.cfp-m-flip-v');
-    var $user = $('.cfp-editor-user');
+    var $userWrap = $('.cfp-editor-user'), $userImg = $userWrap.find('img');
 
     function loadUser(file){
       if (!file) return;
@@ -302,7 +302,7 @@
       var reader = new FileReader();
       reader.onload = function(e){
         state.userImg = new Image();
-        state.userImg.onload = function(){ openModal(); resetUserTransform(); bindDragging(); $user.attr('src', e.target.result); };
+        state.userImg.onload = function(){ openModal(); resetUserTransform(); bindDragging(); $userImg.attr('src', e.target.result); };
         state.userImg.src = e.target.result;
       };
       reader.readAsDataURL(file);

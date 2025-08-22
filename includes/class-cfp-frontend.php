@@ -133,7 +133,9 @@ final class CFP_Frontend {
               <div class="cfp-editor-wrap">
                 <img class="cfp-editor-frame" alt="frame"/>
                 <div class="cfp-editor-overlay">
-                  <img class="cfp-editor-user" alt=""/>
+                  <div class="cfp-editor-user">
+                    <img class="cfp-user-img" alt="" />
+                  </div>
                 </div>
               </div>
             </div>
