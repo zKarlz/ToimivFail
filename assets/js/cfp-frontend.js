@@ -41,9 +41,9 @@
     frameImg: null,
     userImg: null,
     originalFile: null,
-    overlayPx: null, // {x,y,w,h,ratio}
+    overlayPx: null,
     drag: {on:false, sx:0, sy:0, ox:0, oy:0},
-    userPos: {x:0, y:0} // relative within overlay
+    userPos: {x:0, y:0}
   };
 
   // Build UI thumbnails
@@ -90,7 +90,7 @@
     state.frameImg.src = f.url;
   }
 
-  function resetUserTransform(){
+  function resetUserPosition(){
     state.userPos = {x:0, y:0};
     var $u = $('.cfp-editor-user');
     var $ov = $('.cfp-editor-overlay');
@@ -117,7 +117,7 @@
         ['nw','ne','sw','se'].forEach(function(p){ $u.append('<div class="cfp-resize-handle cfp-rh-'+p+'"></div>'); });
         bindResizing();
       }
-      resetUserTransform();
+      resetUserPosition();
     }, 50);
   }
 
@@ -211,7 +211,7 @@
     ctx.rect(ov.x, ov.y, ov.w, ov.h);
     ctx.clip();
 
-    // Compute user draw transform:
+    // Compute user draw position and scale:
     // Determine displayed overlay scale: user image base scale so that shorter side fits overlay
     var uw = state.userImg.naturalWidth, uh = state.userImg.naturalHeight;
     var $u = $('.cfp-editor-user');
@@ -284,7 +284,7 @@
       var reader = new FileReader();
       reader.onload = function(e){
         state.userImg = new Image();
-        state.userImg.onload = function(){ openModal(); resetUserTransform(); bindDragging(); $userImg.attr('src', e.target.result); };
+        state.userImg.onload = function(){ openModal(); resetUserPosition(); bindDragging(); $userImg.attr('src', e.target.result); };
         state.userImg.src = e.target.result;
       };
       reader.readAsDataURL(file);
