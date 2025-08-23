@@ -26,7 +26,7 @@ final class CFP_Admin {
         if (!$screen || $screen->post_type !== 'product') return;
         wp_enqueue_media();
         wp_enqueue_style('cfp-admin', CFP_URL.'assets/css/cfp-admin.css', [], '1.6.0');
-        wp_enqueue_script('cfp-admin', CFP_URL.'assets/js/cfp-admin.js', ['jquery'], '1.6.0', true);
+        wp_enqueue_script('cfp-admin', CFP_URL.'assets/js/cfp-admin.js', ['jquery', 'jquery-ui-draggable', 'jquery-ui-resizable'], '1.6.0', true);
     }
 
     public static function render_box($post){
@@ -54,6 +54,7 @@ final class CFP_Admin {
     private static function row_tpl($idx, $f, $empty){
         $aid = isset($f['attachment_id']) ? intval($f['attachment_id']) : 0;
         $thumb = $aid ? wp_get_attachment_image($aid, [80,80]) : '';
+        $full = $aid ? wp_get_attachment_url($aid) : '';
         $o = isset($f['overlay']) ? $f['overlay'] : [];
         ?>
         <div class="cfp-row">
@@ -66,7 +67,7 @@ final class CFP_Admin {
                 <div class="cfp-media">
                     <input type="hidden" name="cfp_frames[<?php echo esc_attr($idx); ?>][attachment_id]" value="<?php echo esc_attr($aid); ?>" class="cfp-attach-id" />
                     <button class="button cfp-pick"><?php esc_html_e('Select image','wc-cfp'); ?></button>
-                    <div class="cfp-thumb"><?php echo $thumb; ?></div>
+                    <div class="cfp-thumb" data-full="<?php echo esc_url($full); ?>"><?php echo $thumb; ?></div>
                 </div>
             </div>
             <div class="cfp-col cfp-overlay">
@@ -79,6 +80,7 @@ final class CFP_Admin {
                     <input placeholder="rotation" name="cfp_frames[<?php echo esc_attr($idx); ?>][overlay][rotation]" type="number" step="0.01" value="<?php echo esc_attr($o['rotation'] ?? ''); ?>" />
                     <input placeholder="ratio" name="cfp_frames[<?php echo esc_attr($idx); ?>][overlay][ratio]" type="number" step="0.0001" value="<?php echo esc_attr($o['ratio'] ?? ''); ?>" />
                 </div>
+                <p><button type="button" class="button cfp-set-overlay"><?php esc_html_e('Select area','wc-cfp'); ?></button></p>
             </div>
             <a class="button-link delete cfp-remove"><?php esc_html_e('Remove','wc-cfp'); ?></a>
         </div>
